@@ -279,9 +279,15 @@ def infer_frequency(data: pd.DataFrame, date_index: str,
     n_steps = len(observed_times)
 
     if n_steps > 1:
+      # Original, returns error:
+      # ValueError: Cannot convert from timedelta64[ns] to timedelta64[D]. Supported resolutions are 's', 'ms', 'us', 'ns'
+      # time_diffs = (
+      #     observed_times[1:n_steps] -
+      #     observed_times[0:(n_steps - 1)]).astype('timedelta64[D]').values
+
       time_diffs = (
           observed_times[1:n_steps] -
-          observed_times[0:(n_steps - 1)]).astype('timedelta64[D]').values
+          observed_times[0:(n_steps - 1)]).days.values
 
       min_frequency = np.min(time_diffs)
 
