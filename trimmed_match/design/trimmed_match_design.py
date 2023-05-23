@@ -212,7 +212,10 @@ class TrimmedMatchGeoXDesign(object):
       else:
         pretest['training_' + metric] = pretest[metric]
 
-    pretest = pretest.groupby('geo', as_index=False).sum()
+    # Original, receiving error:
+    # TypeError: datetime64 type does not support sum operations
+    # pretest = pretest.groupby('geo', as_index=False).sum()
+    pretest = pretest.groupby('geo', as_index=False).sum(numeric_only=True)
     # if the number of geos is odd, remove the largest geo for pairing
     if self._pretest_data['geo'].nunique() % 2 != 0:
       largest_geo = pretest.sort_values('response', ascending=False)[
@@ -264,8 +267,12 @@ class TrimmedMatchGeoXDesign(object):
       raise ValueError('pairs are not specified.')
 
     pretest_data = self._pretest_data.copy()
+    # Original, receiving error:
+    # TypeError: datetime64 type does not support sum operations
+    # pretest_data = pretest_data.groupby(['geo', 'period'],
+    #                                     as_index=False).sum()
     pretest_data = pretest_data.groupby(['geo', 'period'],
-                                        as_index=False).sum()
+                                        as_index=False).sum(numeric_only=True)
     eval_data = pretest_data[pretest_data['period'] == EXPERIMENT].groupby(
         'geo', as_index=False).sum()
 
